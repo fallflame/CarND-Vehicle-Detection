@@ -74,4 +74,5 @@ By applying another threshold, I remove maximun false positive.
 ### Discussion
 
 1. When I use histogram feature of the image, the accuracy on the validation image increased. However, the error seems increased on real detection. I think there might a bais in our training set.
-2. The accuracy and the speed are both important. We need to detect 
+2. The accuracy and the speed are both important. We need to detect 416 images for each frame, to find vehicles.
+3. It is possible to reused the result of the last frame. For example, if a car is detected, we can track it with template matching. This can accelerate the speed and also allow us to track the movement.

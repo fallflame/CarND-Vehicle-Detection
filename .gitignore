@@ -1,0 +1,6 @@
+example/
+non-vehicles/
+vehicles/
+__pycache__/
+debug.log
+.ipynb_checkpoints/
