@@ -1,16 +1,11 @@
 # Vehicle Detection
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-
-In this project, your goal is to write a software pipeline to detect vehicles in a video (start with the test_video.mp4 and later implement on full project_video.mp4), but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
-
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You can submit your writeup in markdown or use another method and submit a pdf instead.
+[HOG]: ./output_images/hog-visualization.jpg "HOG"
+[dataset]: ./output_images/image_example.png "Dataset Example"
+[windows]: ./output_images/search_windows.png "Search Windows"
+[windows_vehicle]: ./output_images/windows_with_vehicle.png "Windows with Vehicle"
+[car_detected]: ./output_images/car_detected.png "Windows with Vehicle"
 
 The Project
 ---
@@ -18,16 +13,65 @@ The Project
 The goals / steps of this project are the following:
 
 * Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images and train a classifier Linear SVM classifier
-* Optionally, you can also apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. 
-* Note: for those first two steps don't forget to normalize your features and randomize a selection for training and testing.
-* Implement a sliding-window technique and use your trained classifier to search for vehicles in images.
-* Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
+* Optionally, apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. 
+* Implement a sliding-window technique and use your a classifier to search for vehicles in images.
+* Run the pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
 * Estimate a bounding box for vehicles detected.
 
-Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/vehicles.zip) and [non-vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/non-vehicles.zip) examples to train your classifier.  These example images come from a combination of the [GTI vehicle image database](http://www.gti.ssr.upm.es/data/Vehicle_database.html), the [KITTI vision benchmark suite](http://www.cvlibs.net/datasets/kitti/), and examples extracted from the project video itself.   You are welcome and encouraged to take advantage of the recently released [Udacity labeled dataset](https://github.com/udacity/self-driving-car/tree/master/annotations) to augment your training data.  
 
-Some example images for testing your pipeline on single frames are located in the `test_images` folder.  To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `ouput_images`, and include them in your writeup for the project by describing what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+### Histogram of Oriented Gradients (HOG)
 
-**As an optional challenge** Once you have a working pipeline for vehicle detection, add in your lane-finding algorithm from the last project to do simultaneous lane-finding and vehicle detection!
+The histogram of oriented gradients (HOG) is a feature descriptor used in computer vision and image processing for the purpose of object detection. The technique counts occurrences of gradient orientation in localized portions of an image. In this project, I use HOG method to detect vehicles.
 
-**If you're feeling ambitious** (also totally optional though), don't stop there!  We encourage you to go out and take video of your own, and show us how you would implement this project on a new video!
+HOG calculate the gradient of a cell (a small part of image) in several given directions.
+
+These gradient value can be used as feature for a classifier.
+
+![][HOG]
+
+### Vehicle classifier
+
+The training data contains 11,631 vehicle images and 8,971 non-vehicle images. All the image is 64x64 pixels.
+
+![][dataset]
+
+I use a Linear Support Vector Machine classifier to classify the vehicles.
+
+(LinearSVC in sklearn.svm package)
+
+Finally, I use only the HOG of Grey image as the features to train the SVM classifier. The feature's length is 324.
+
+(I tried HOG for the saturation channel, history information of pixels. In conisderate both the speed and accuracy, I use HOG of Grey only.)
+
+The data set is split to trainning data and testing data in a ratio 4:1
+
+Classifier performance:
+
+Test Accuracy of SVC =  0.9364
+
+
+### Sliding Window Search
+
+I defined a set of windows for searching windows. Different window sizes are used for car far, middle and near. In total 416 of detection windows are used.
+
+![][windows]
+
+For each window, the picture is extracted and I detected if there is a vehicle in this window.
+
+![][windows_vehicle]
+
+These windows are overlap with each other. Thus a vehicle will be detected several times. We use these positive detection generate a heat map. Only value > 2 in the heat map will be hold. Based on the heat map, we draw a rectangle to indicate the position of the vehicle.
+
+![][car_detected]
+
+
+### Video Implementation
+
+To detect the vehicles in a video, I use a queue to keep the record of the heat map of last 5 images.
+By applying another threshold, I remove maximun false positive. 
+
+
+### Discussion
+
+1. When I use histogram feature of the image, the accuracy on the validation image increased. However, the error seems increased on real detection. I think there might a bais in our training set.
+2. The accuracy and the speed are both important. We need to detect 
