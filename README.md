@@ -23,7 +23,10 @@ The goals / steps of this project are the following:
 
 The histogram of oriented gradients (HOG) is a feature descriptor used in computer vision and image processing for the purpose of object detection. The technique counts occurrences of gradient orientation in localized portions of an image. In this project, I use HOG method to detect vehicles.
 
-HOG calculate the gradient of a cell (a small part of image) in several given directions.
+HOG calculate the gradient of a cell (a small part of image) in several given directions. I explored several different parameters that seems worthy of trying, e.g. different channels, spatial bin size, pixels per cell and cells per block, and their combinations. 
+
+Finally, based on the speed and accuracy, I choosed the `hog` function with `32x32` gray image, `8` pixels per cell, `2` cells per block, `8` orients. 
+
 
 These gradient value can be used as feature for a classifier.
 
@@ -48,6 +51,8 @@ The data set is split to trainning data and testing data in a ratio 4:1
 Classifier performance:
 
 Test Accuracy of SVC =  0.9364
+
+I also tried Classification Tree, Convolutional Neural Network. Classification Tree's accuracy is not enough. CNN is a little bit slow but have no better result than SVM model.
 
 
 ### Sliding Window Search
